@@ -11,7 +11,7 @@ type sensorConfig struct {
 	Reachable     *bool   `json:"reachable,omitempty"`
 	Battery       *uint8  `json:"battery,omitempty"`
 	Longitude     *string `json:"long,omitempty"`
-	Latitude      *string `json:"lat,omitempty`
+	Latitude      *string `json:"lat,omitempty"`
 	SunriseOffset *int    `json:"sunriseoffset,omitempty"`
 	SunsetOffset  *int    `json:"sunsetoffset,omitempty"`
 }
