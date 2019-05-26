@@ -233,6 +233,8 @@ func TestGetConfigAndData(t *testing.T) {
 	assert.NoError(t, err)
 	defer cleanup()
 
+	b.mqtt.WaitForDevice(ctx, "test/light1")
+
 	username := registerTestingUser(t, b)
 
 	st, body := tReq(t, b, http.MethodGet, fmt.Sprintf("/api/%s", username), nil)
