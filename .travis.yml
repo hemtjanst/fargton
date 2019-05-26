@@ -1,0 +1,43 @@
+language: go
+services:
+  - docker
+notifications:
+  email: false
+branches:
+  only:
+    - master
+    - /^v\d+\.\d+(\.\d+)?(-\S*)?$/
+go:
+  - 1.11.x
+  - 1.12.x
+  - master
+matrix:
+  fast_finish: true
+  allow_failures:
+    - go: master
+env:
+  global:
+    - GO111MODULE=on
+cache:
+  directories:
+    - $HOME/docker
+    - $HOME/.cache/go-build
+    - $GOPATH/pkg/mod
+before_cache:
+  - >
+    mkdir -p $HOME/docker && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
+    | xargs -n 2 -t sh -c 'test -e $HOME/docker/$1.tar.gz || docker save $0 | gzip -2 > $HOME/docker/$1.tar.gz'
+before_install:
+  - if [[ -d $HOME/docker ]]; then ls $HOME/docker/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
+  - docker pull eclipse-mosquitto:1.6.2
+  - docker run -d --name broker -p 127.0.0.1:1883:1883 eclipse-mosquitto:1.6.2 -- mosquitto -v
+  - docker ps
+  - go mod download
+install: go build ./...
+script: go test -v -coverprofile=profile.cov $(go list ./...)
+after_success:
+  - test -n "$TRAVIS_TAG" && curl -sL https://git.io/goreleaser | bash
+  - go get github.com/mattn/goveralls
+  - $GOPATH/bin/goveralls -coverprofile=profile.cov -service=travis-ci
+after_failure:
+  - docker logs broker
