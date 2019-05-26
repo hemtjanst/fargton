@@ -27,8 +27,10 @@ func main() {
 	flgWhitelist := flag.String("bridge.whitelist", "./whitelist.json", "path to where we will load and store whitelist entries")
 
 	flgAuth := flag.Bool("bridge.auth-disable", false, "Disable checking requests against whitelist")
-	flgSunrise := flag.Uint("sun.rise", 7, "hour the sun rises, in UTC")
-	flgSunset := flag.Uint("sun.set", 22, "hour the sun set, in UTC")
+
+	flgLatitude := flag.Float64("location.lat", 0, "latitude of the bridge location")
+	flgLongitude := flag.Float64("location.long", 0, "longitude of the bridge location")
+
 	flag.Parse()
 
 	l, _ := zap.NewDevelopment()
@@ -51,8 +53,8 @@ func main() {
 		bridge.TLSPrivateKeyPath(*flgTLSPrivKey),
 		bridge.DisableAuthentication(*flgAuth),
 		bridge.WhitelistConfigPath(*flgWhitelist),
-		bridge.Sunrise(*flgSunrise),
-		bridge.Sunset(*flgSunset),
+		bridge.Latitude(*flgLatitude),
+		bridge.Longitude(*flgLongitude),
 	)
 	if err != nil {
 		l.Fatal(err.Error())

@@ -48,8 +48,8 @@ type Config struct {
 	lights int
 	groups int
 
-	sunrise uint8
-	sunset  uint8
+	latitude  float64
+	longitude float64
 
 	sync.RWMutex
 }
@@ -176,18 +176,26 @@ func WhitelistConfigPath(a string) ConfigOption {
 	}
 }
 
-// Sunrise configures when the sun rises
-func Sunrise(i uint) ConfigOption {
+// Latitude configures the latitude of the bridge's location
+// This value is used for the Daylight sensor
+func Latitude(lat float64) ConfigOption {
 	return func(args *Config) error {
-		args.sunrise = uint8(i)
+		if lat < -90.0 || lat > 90.0 {
+			return fmt.Errorf("latitude must be between -90.0 and 90.0, got: %f", lat)
+		}
+		args.latitude = lat
 		return nil
 	}
 }
 
-// Sunset configures when the sun rises
-func Sunset(i uint) ConfigOption {
+// Longitude configures the longitute of the bridge's location
+// This value is used for the Daylight sensor
+func Longitude(long float64) ConfigOption {
 	return func(args *Config) error {
-		args.sunset = uint8(i)
+		if long < -180.0 || long > 180.0 {
+			return fmt.Errorf("latitude must be between -180.0 and 180.0, got: %f", long)
+		}
+		args.longitude = long
 		return nil
 	}
 }

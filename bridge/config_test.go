@@ -46,6 +46,8 @@ func TestNewConfig(t *testing.T) {
 		assert.Equal(t, "UTC", c.timezone.String())
 		assert.False(t, c.authDisabled)
 		assert.Equal(t, "", c.whitelistConfigPath)
+		assert.Equal(t, 0.0, c.latitude)
+		assert.Equal(t, 0.0, c.longitude)
 	})
 	t.Run("MAC", func(t *testing.T) {
 		t.Run("valid", func(t *testing.T) {
@@ -222,6 +224,56 @@ func TestNewConfig(t *testing.T) {
 			}
 
 			assert.Equal(t, t.Name(), c.whitelistConfigPath)
+		})
+	})
+	t.Run("latitude", func(t *testing.T) {
+		t.Run("valid", func(t *testing.T) {
+			c, err := NewConfig(Name(t.Name()), Latitude(50.85045))
+			if !assert.Nil(t, err) {
+				t.FailNow()
+			}
+			if !assert.NotNil(t, c) {
+				t.FailNow()
+			}
+
+			assert.Equal(t, 50.85045, c.latitude)
+		})
+		t.Run("invalid", func(t *testing.T) {
+			t.Run("over", func(t *testing.T) {
+				c, err := NewConfig(Name(t.Name()), Latitude(95.0))
+				assert.NotNil(t, err)
+				assert.Nil(t, c)
+			})
+			t.Run("under", func(t *testing.T) {
+				c, err := NewConfig(Name(t.Name()), Latitude(-95.0))
+				assert.NotNil(t, err)
+				assert.Nil(t, c)
+			})
+		})
+	})
+	t.Run("longitude", func(t *testing.T) {
+		t.Run("valid", func(t *testing.T) {
+			c, err := NewConfig(Name(t.Name()), Longitude(4.34878))
+			if !assert.Nil(t, err) {
+				t.FailNow()
+			}
+			if !assert.NotNil(t, c) {
+				t.FailNow()
+			}
+
+			assert.Equal(t, 4.34878, c.longitude)
+		})
+		t.Run("invalid", func(t *testing.T) {
+			t.Run("over", func(t *testing.T) {
+				c, err := NewConfig(Name(t.Name()), Longitude(182.0))
+				assert.NotNil(t, err)
+				assert.Nil(t, c)
+			})
+			t.Run("under", func(t *testing.T) {
+				c, err := NewConfig(Name(t.Name()), Longitude(-182.0))
+				assert.NotNil(t, err)
+				assert.Nil(t, c)
+			})
 		})
 	})
 }

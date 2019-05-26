@@ -31,6 +31,9 @@ It supports:
         * Use [Node-RED][nodered] for this
     * [ ] Sensors
         * Only returns the hardcoded daylight sensor for now
+            * Ensure you pass `location.lat` and `location.long` when you start
+              start the bridge so that the sunrise/sunset calculation is
+              correct. If you do not it will default to Null Island.
     * [x] ~~Rules~~
         * Returns empty
         * Use [Node-RED][nodered] for this

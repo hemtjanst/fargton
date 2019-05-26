@@ -1,9 +1,14 @@
 package bridge
 
 import (
+	"fmt"
+	"math"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi"
+	"github.com/kelvins/sunrisesunset"
+	"go.uber.org/zap"
 )
 
 type sensorConfig struct {
@@ -43,6 +48,25 @@ func (sensors) Render(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (s *Server) newDaylightSensor() sensor {
+	s.config.RLock()
+	lat := s.config.latitude
+	long := s.config.longitude
+	s.config.RUnlock()
+
+	var lats *string
+	if math.Signbit(lat) {
+		lats = StrPtr(fmt.Sprintf("%.4fS", lat*-1))
+	} else {
+		lats = StrPtr(fmt.Sprintf("%.4fN", lat))
+	}
+
+	var longs *string
+	if math.Signbit(long) {
+		longs = StrPtr(fmt.Sprintf("%.4fW", long*-1))
+	} else {
+		longs = StrPtr(fmt.Sprintf("%.4fE", long))
+	}
+
 	sen := sensor{
 		State: sensorState{
 			Daylight:    BoolPtr(s.isDaylight()),
@@ -50,8 +74,8 @@ func (s *Server) newDaylightSensor() sensor {
 		},
 		Config: sensorConfig{
 			On:            true,
-			Longitude:     StrPtr("none"),
-			Latitude:      StrPtr("none"),
+			Latitude:      lats,
+			Longitude:     longs,
 			SunriseOffset: IntPtr(0),
 			SunsetOffset:  IntPtr(0),
 		},
@@ -68,11 +92,33 @@ func (s *Server) newDaylightSensor() sensor {
 func (s *Server) isDaylight() bool {
 	t := now().UTC()
 	h := t.Hour()
+	m := t.Minute()
+	year, month, day := t.Date()
 
 	s.config.RLock()
-	defer s.config.RUnlock()
-	if h >= int(s.config.sunrise) && h < int(s.config.sunset) {
-		return true
+	p := sunrisesunset.Parameters{
+		Latitude:  s.config.latitude,
+		Longitude: s.config.longitude,
+		UtcOffset: 0.0,
+		Date:      time.Date(year, month, day, 0, 0, 0, 0, time.UTC),
+	}
+	s.config.RUnlock()
+
+	sunrise, sunset, err := p.GetSunriseSunset()
+	if err != nil {
+		s.logger.Error(err.Error())
+		return false
+	}
+
+	s.logger.Debug("daylight",
+		zap.String("sunrise", fmt.Sprintf("%02d:%02d", sunrise.Hour(), sunrise.Minute())),
+		zap.String("sunset", fmt.Sprintf("%02d:%02d", sunset.Hour(), sunset.Minute())),
+		zap.String("current", fmt.Sprintf("%02d:%02d", h, m)))
+
+	if h >= sunrise.Hour() && h < sunset.Hour() {
+		if m >= sunrise.Minute() && m < sunset.Minute() {
+			return true
+		}
 	}
 
 	return false

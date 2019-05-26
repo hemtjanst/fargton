@@ -16,24 +16,41 @@ func TestNewDaylightSensor(t *testing.T) {
 	b, shutdown := NewTestingBridge(t, nil)
 	defer cancel()
 	defer shutdown(ctx)
-	d := b.newDaylightSensor()
-	assert.Equal(t, "Daylight", d.Name)
-	assert.Equal(t, "Daylight", d.Type)
-	assert.Equal(t, "PHDL00", d.ModelID)
-	assert.Equal(t, "Philips", d.ManufacturerName)
-	assert.Equal(t, "1.0", *d.SWVersion)
+	t.Run("default", func(t *testing.T) {
+		d := b.newDaylightSensor()
+		assert.Equal(t, "Daylight", d.Name)
+		assert.Equal(t, "Daylight", d.Type)
+		assert.Equal(t, "PHDL00", d.ModelID)
+		assert.Equal(t, "Philips", d.ManufacturerName)
+		assert.Equal(t, "1.0", *d.SWVersion)
 
-	assert.False(t, *d.State.Daylight)
-	assert.Equal(t, DateTimeToISO8600(now().UTC()), d.State.LastUpdated)
-	assert.Nil(t, d.State.ButtonEvent)
+		assert.False(t, *d.State.Daylight)
+		assert.Equal(t, DateTimeToISO8600(now().UTC()), d.State.LastUpdated)
+		assert.Nil(t, d.State.ButtonEvent)
 
-	assert.True(t, d.Config.On)
-	assert.Nil(t, d.Config.Reachable)
-	assert.Nil(t, d.Config.Battery)
-	assert.Equal(t, "none", *d.Config.Longitude)
-	assert.Equal(t, "none", *d.Config.Latitude)
-	assert.Equal(t, 0, *d.Config.SunriseOffset)
-	assert.Equal(t, 0, *d.Config.SunsetOffset)
+		assert.True(t, d.Config.On)
+		assert.Nil(t, d.Config.Reachable)
+		assert.Nil(t, d.Config.Battery)
+		assert.Equal(t, "0.0000E", *d.Config.Longitude)
+		assert.Equal(t, "0.0000N", *d.Config.Latitude)
+		assert.Equal(t, 0, *d.Config.SunriseOffset)
+		assert.Equal(t, 0, *d.Config.SunsetOffset)
+	})
+	t.Run("south-western hemisphere", func(t *testing.T) {
+		b.config.Lock()
+		b.config.latitude = -1.0
+		b.config.longitude = -1.0
+		b.config.Unlock()
+		defer func() {
+			b.config.Lock()
+			b.config.latitude = 0.0
+			b.config.longitude = 0.0
+			b.config.Unlock()
+		}()
+		d := b.newDaylightSensor()
+		assert.Equal(t, "1.0000W", *d.Config.Longitude)
+		assert.Equal(t, "1.0000S", *d.Config.Latitude)
+	})
 }
 func TestGetAllSensors(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
