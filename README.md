@@ -1,4 +1,4 @@
-# 🎨 Färgton 💡
+# 🎨 Färgton 💡 [![Build Status](https://travis-ci.org/hemtjanst/fargton.svg?branch=master)](https://travis-ci.org/hemtjanst/fargton) [![Coverage Status](https://coveralls.io/repos/github/hemtjanst/fargton/badge.svg?branch=master)](https://coveralls.io/github/hemtjanst/fargton?branch=master)
 
 Färgton (Swedish for hue/tint/tone) is a Philips Hue bridge exposing Hemtjänst
 lights, light groups and sensors. It emulates a second generation Hue bridge
