@@ -1,0 +1,11 @@
+{
+    "devices": [
+        {
+            "topic": "test/light2",
+            "name": "Color Temperature Light",
+            "type": "lightbulb",
+            "feature": {"on": {}, "brightness": {}, "colorTemperature":{}},
+            "init": {"on": "0", "brightness": "1", "colorTemperature": "400"}
+          }
+    ]
+}

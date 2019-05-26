@@ -1,0 +1,11 @@
+{
+    "devices": [
+        {
+            "topic": "test/light1",
+            "name": "Dimmable Light",
+            "type": "lightbulb",
+            "feature": {"on": {}, "brightness": {}},
+            "init": {"on": "0", "brightness": "5"}
+          }
+    ]
+}
