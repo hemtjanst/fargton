@@ -110,15 +110,16 @@ func (s *Server) isDaylight() bool {
 		return false
 	}
 
+	sunriseT := time.Date(year, month, day, sunrise.Hour(), sunrise.Minute(), 0, 0, time.UTC)
+	sunsetT := time.Date(year, month, day, sunset.Hour(), sunset.Minute(), 0, 0, time.UTC)
+
 	s.logger.Debug("daylight",
 		zap.String("sunrise", fmt.Sprintf("%02d:%02d", sunrise.Hour(), sunrise.Minute())),
 		zap.String("sunset", fmt.Sprintf("%02d:%02d", sunset.Hour(), sunset.Minute())),
 		zap.String("current", fmt.Sprintf("%02d:%02d", h, m)))
 
-	if h >= sunrise.Hour() && h < sunset.Hour() {
-		if m >= sunrise.Minute() && m < sunset.Minute() {
-			return true
-		}
+	if t.After(sunriseT) && t.Before(sunsetT) {
+		return true
 	}
 
 	return false
