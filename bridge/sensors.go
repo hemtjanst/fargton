@@ -24,7 +24,7 @@ type sensorConfig struct {
 type sensorState struct {
 	Daylight    *bool  `json:"daylight,omitempty"`
 	ButtonEvent *int   `json:"buttonevent,omitempty"`
-	LastUpdated string `json:lastupdated`
+	LastUpdated string `json:"lastupdated"`
 }
 
 type sensor struct {
