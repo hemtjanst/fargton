@@ -10,11 +10,11 @@ import (
 	"time"
 )
 
-const apiVersion = "1.31.0"
+const apiVersion = "1.35.0"
 const bridgeModel = "BSB002"
 const fallbackMAC = "01:23:45:67:89:AB"
-const swVersion = "1931069120"
-const datastoreVersion = "80"
+const swVersion = "1935144020"
+const datastoreVersion = "88"
 const uuidPrefix = "2f402f80-da50-11e1-9b23"
 
 var now = time.Now
