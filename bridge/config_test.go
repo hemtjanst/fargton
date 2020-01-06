@@ -28,9 +28,9 @@ func TestNewConfig(t *testing.T) {
 			t.FailNow()
 		}
 		assert.Equal(t, t.Name(), c.Name)
-		assert.Equal(t, apiVersion, c.APIVersion)
-		assert.Equal(t, swVersion, c.SWVersion)
-		assert.Equal(t, datastoreVersion, c.DatastoreVersion)
+		assert.Equal(t, DefaultAPIVersion, c.APIVersion)
+		assert.Equal(t, DefaultSWVersion, c.SWVersion)
+		assert.Equal(t, DefaultDatastoreVersion, c.DatastoreVersion)
 		assert.Equal(t, bridgeModel, c.ModelID)
 		assert.Equal(t, MACAddr{0x1, 0x23, 0x45, 0x67, 0x89, 0xab}, c.MACAddress)
 		assert.Equal(t, "012345FFFE6789AB", c.BridgeID)
@@ -48,6 +48,39 @@ func TestNewConfig(t *testing.T) {
 		assert.Equal(t, "", c.whitelistConfigPath)
 		assert.Equal(t, 0.0, c.latitude)
 		assert.Equal(t, 0.0, c.longitude)
+	})
+	t.Run("APIVersion", func(t *testing.T) {
+		c, err := NewConfig(Name(t.Name()), APIVersion("x.y.z"))
+		if !assert.Nil(t, err) {
+			t.FailNow()
+		}
+		if !assert.NotNil(t, c) {
+			t.FailNow()
+		}
+
+		assert.Equal(t, "x.y.z", c.APIVersion)
+	})
+	t.Run("SWVersion", func(t *testing.T) {
+		c, err := NewConfig(Name(t.Name()), SWVersion("xyz"))
+		if !assert.Nil(t, err) {
+			t.FailNow()
+		}
+		if !assert.NotNil(t, c) {
+			t.FailNow()
+		}
+
+		assert.Equal(t, "xyz", c.SWVersion)
+	})
+	t.Run("DatastoreVersion", func(t *testing.T) {
+		c, err := NewConfig(Name(t.Name()), DatastoreVersion("10"))
+		if !assert.Nil(t, err) {
+			t.FailNow()
+		}
+		if !assert.NotNil(t, c) {
+			t.FailNow()
+		}
+
+		assert.Equal(t, "10", c.DatastoreVersion)
 	})
 	t.Run("MAC", func(t *testing.T) {
 		t.Run("valid", func(t *testing.T) {

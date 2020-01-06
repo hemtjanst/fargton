@@ -31,6 +31,10 @@ func main() {
 	flgLatitude := flag.Float64("location.lat", 0, "latitude of the bridge location")
 	flgLongitude := flag.Float64("location.long", 0, "longitude of the bridge location")
 
+	flgSWVersion := flag.String("bridge.swversion", bridge.DefaultSWVersion, "Software version")
+	flgAPIVersion := flag.String("bridge.apiversion", bridge.DefaultAPIVersion, "API version")
+	flgDSVersion := flag.String("bridge.datastoreversion", bridge.DefaultDatastoreVersion, "Datastore version")
+
 	flag.Parse()
 
 	l, _ := zap.NewDevelopment()
@@ -55,6 +59,9 @@ func main() {
 		bridge.WhitelistConfigPath(*flgWhitelist),
 		bridge.Latitude(*flgLatitude),
 		bridge.Longitude(*flgLongitude),
+		bridge.APIVersion(*flgAPIVersion),
+		bridge.SWVersion(*flgSWVersion),
+		bridge.DatastoreVersion(*flgDSVersion),
 	)
 	if err != nil {
 		l.Fatal(err.Error())

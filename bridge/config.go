@@ -10,11 +10,12 @@ import (
 	"time"
 )
 
-const apiVersion = "1.35.0"
+const DefaultAPIVersion = "1.35.0"
+const DefaultSWVersion = "1935144020"
+const DefaultDatastoreVersion = "88"
+
 const bridgeModel = "BSB002"
 const fallbackMAC = "01:23:45:67:89:AB"
-const swVersion = "1935144020"
-const datastoreVersion = "88"
 const uuidPrefix = "2f402f80-da50-11e1-9b23"
 
 var now = time.Now
@@ -84,6 +85,30 @@ type ConfigOption func(*Config) error
 func Name(n string) ConfigOption {
 	return func(args *Config) error {
 		args.Name = n
+		return nil
+	}
+}
+
+// APIVersion sets the APIVersion in Config
+func APIVersion(v string) ConfigOption {
+	return func(args *Config) error {
+		args.APIVersion = v
+		return nil
+	}
+}
+
+// SWVersion sets the SWVersion in Config
+func SWVersion(v string) ConfigOption {
+	return func(args *Config) error {
+		args.SWVersion = v
+		return nil
+	}
+}
+
+// DatastoreVersion sets the DatastoreVersion in Config
+func DatastoreVersion(v string) ConfigOption {
+	return func(args *Config) error {
+		args.DatastoreVersion = v
 		return nil
 	}
 }
@@ -210,11 +235,8 @@ func bridgeIDfromMAC(m MACAddr) string {
 // the specified options
 func NewConfig(setters ...ConfigOption) (*Config, error) {
 	c := &Config{
-		APIVersion:       apiVersion,
-		ModelID:          bridgeModel,
-		SWVersion:        swVersion,
-		DatastoreVersion: datastoreVersion,
-		Whitelist:        &map[string]whitelist{},
+		ModelID:   bridgeModel,
+		Whitelist: &map[string]whitelist{},
 	}
 
 	for _, setter := range setters {
@@ -226,6 +248,18 @@ func NewConfig(setters ...ConfigOption) (*Config, error) {
 
 	if c.Name == "" {
 		return nil, fmt.Errorf("must give the bridge a name")
+	}
+
+	if c.APIVersion == "" {
+		_ = APIVersion(DefaultAPIVersion)(c)
+	}
+
+	if c.SWVersion == "" {
+		_ = SWVersion(DefaultSWVersion)(c)
+	}
+
+	if c.DatastoreVersion == "" {
+		_ = DatastoreVersion(DefaultDatastoreVersion)(c)
 	}
 
 	if strings.HasPrefix(c.address, ":") && !strings.HasPrefix(c.address, ":::") {
